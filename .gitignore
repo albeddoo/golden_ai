@@ -1,5 +1,20 @@
-(empty)node_modules/
-.next/
-dist/
+# Environment files
+.env
+.env.local
+*.env.*
+
+# Build artifacts and dependencies
+__pycache__/
+*.pyc
 build/
+dist/
+.venv/
+venv/
+
+# Logs and temp files
 *.log
+*.tmp
+
+# Editor/IDE files
+.vscode/
+.idea/

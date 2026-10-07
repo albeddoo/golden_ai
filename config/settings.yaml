@@ -1,0 +1,373 @@
+# GOLD AI - Configuration File
+# Live Multi-Agent Gold Market Intelligence & Forecasting Terminal
+
+# Application Settings
+app:
+  name: "GOLD AI"
+  version: "1.0.0"
+  mode: "paper"  # live, backtest, paper
+  timezone: "UTC"  # Display timezone (internal always UTC)
+  
+# Data Directory
+data:
+  base_dir: "./data"
+  cache_dir: "./data/cache"
+  database_path: "./data/gold_ai.db"
+  models_dir: "./data/models"
+  logs_dir: "./data/logs"
+
+# Logging
+logging:
+  level: "INFO"  # DEBUG, INFO, WARNING, ERROR, CRITICAL
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  file: "gold_ai.log"
+  max_size_mb: 50
+  backup_count: 5
+
+# Market Data Providers
+providers:
+  market_data:
+    enabled: true
+    provider: "synthetic"  # synthetic, polygon, alpha_vantage, custom
+    symbols:
+      - "XAUUSD"
+      - "DXY"
+      - "US2Y"
+      - "US10Y"
+      - "US30Y"
+      - "XAGUSD"  # Silver
+      - "WTI"     # Oil
+      - "SPX"     # S&P 500
+      - "VIX"     # Volatility Index
+    
+  news:
+    enabled: false
+    provider: "none"  # none, newsapi, rss_custom
+    api_key_env: "NEWSAPI_KEY"  # Environment variable name
+    sources:
+      - "reuters"
+      - "bloomberg"
+      - "financial_times"
+    
+  economic_calendar:
+    enabled: false
+    provider: "none"  # none, trading_economics, investing_com
+    update_interval_minutes: 60
+    
+  macro_data:
+    enabled: false
+    provider: "none"  # none, fred, bea, bls
+    api_key_env: "FRED_API_KEY"
+    update_interval_hours: 6
+
+# Agent Configuration
+agents:
+  # Update frequencies (in seconds)
+  fast_loop_interval: 1
+  medium_loop_interval: 30
+  slow_loop_interval: 3600
+  
+  # Individual agent settings
+  data_integrity:
+    enabled: true
+    can_block_decision: true
+    
+  spot_market:
+    enabled: true
+    
+  trend:
+    enabled: true
+    ema_periods: [20, 50, 100, 200]
+    timeframes: ["5m", "15m", "1h", "4h", "1d"]
+    
+  momentum:
+    enabled: true
+    rsi_period: 14
+    macd_fast: 12
+    macd_slow: 26
+    macd_signal: 9
+    
+  price_action:
+    enabled: true
+    
+  liquidity:
+    enabled: true
+    zone_lookback_days: 90
+    
+  volatility:
+    enabled: true
+    atr_period: 14
+    vol_window_days: 30
+    
+  session:
+    enabled: true
+    sessions:
+      asian: {start: "00:00", end: "08:00"}
+      london: {start: "07:00", end: "16:00"}
+      newyork: {start: "12:00", end: "21:00"}
+      
+  usd:
+    enabled: true
+    
+  rates:
+    enabled: true
+    
+  real_yield:
+    enabled: true
+    
+  fed_policy:
+    enabled: true
+    
+  economic_calendar:
+    enabled: true
+    
+  inflation:
+    enabled: true
+    
+  labor_market:
+    enabled: true
+    
+  growth:
+    enabled: true
+    
+  news:
+    enabled: false  # Requires news provider
+    
+  geopolitical:
+    enabled: false  # Requires news/geopolitical provider
+    
+  central_bank:
+    enabled: true
+    
+  etf_flows:
+    enabled: true
+    
+  positioning:
+    enabled: true
+    note: "CFTC COT data is weekly/lagged"
+    
+  futures:
+    enabled: false
+    
+  options:
+    enabled: false
+    
+  cross_asset:
+    enabled: true
+    
+  seasonality:
+    enabled: true
+    
+  anomaly:
+    enabled: true
+    
+  regime:
+    enabled: true
+    regimes:
+      - "TRENDING_BULL"
+      - "TRENDING_BEAR"
+      - "RANGE"
+      - "BREAKOUT"
+      - "MEAN_REVERSION"
+      - "HIGH_VOLATILITY"
+      - "LOW_VOLATILITY"
+      - "NEWS_DRIVEN"
+      - "MACRO_DRIVEN"
+      - "RISK_ON"
+      - "RISK_OFF"
+      - "LIQUIDITY_STRESS"
+      - "UNKNOWN"
+      
+  machine_learning:
+    enabled: true
+    models:
+      logistic_regression:
+        enabled: true
+        type: "baseline"
+      random_forest:
+        enabled: true
+        n_estimators: 100
+      xgboost:
+        enabled: true
+        max_depth: 6
+        learning_rate: 0.1
+      lightgbm:
+        enabled: true
+        num_leaves: 31
+        
+    horizons: ["5m", "15m", "30m", "1h", "4h", "1d"]
+    
+  calibration:
+    enabled: true
+    method: "isotonic"  # isotonic, platt, none
+    min_samples: 100
+    
+  drift:
+    enabled: true
+    check_interval_minutes: 60
+    
+  conflict_detector:
+    enabled: true
+    
+  evidence_correlation:
+    enabled: true
+
+# Weighting Engine
+weighting:
+  dynamic: true
+  base_weights:
+    trend: 0.15
+    momentum: 0.10
+    volatility: 0.08
+    usd: 0.12
+    rates: 0.12
+    news: 0.10
+    regime: 0.08
+    ml: 0.15
+    other: 0.10
+    
+  regime_adjustments:
+    TRENDING_BULL:
+      trend: 1.5
+      momentum: 1.3
+      volatility: 0.7
+    TRENDING_BEAR:
+      trend: 1.5
+      momentum: 1.3
+      volatility: 0.7
+    HIGH_VOLATILITY:
+      volatility: 1.8
+      confidence_penalty: 0.3
+    NEWS_DRIVEN:
+      news: 2.0
+      technical: 0.6
+    MACRO_DRIVEN:
+      rates: 1.6
+      usd: 1.6
+      fed_policy: 1.5
+
+# Decision Engine
+decision:
+  thresholds:
+    confidence_levels:
+      uncertain: [0, 55]
+      weak: [55, 65]
+      moderate: [65, 75]
+      strong: [75, 85]
+      very_strong: [85, 100]
+      
+  abstention_rules:
+    max_conflict_score: 70
+    min_data_quality: 60
+    max_event_risk: 85
+    min_calibration_score: 50
+    
+  output:
+    include_scenarios: true
+    include_explanation: true
+    include_agent_breakdown: true
+
+# Event Risk Engine
+event_risk:
+  enabled: true
+  major_events:
+    - "FOMC"
+    - "CPI"
+    - "NFP"
+    - "PCE"
+    - "GDP"
+  states:
+    NORMAL: 0
+    EVENT_APPROACHING: 1
+    EVENT_IMMINENT: 2
+    EVENT_RELEASED: 3
+    POST_EVENT_REPRICING: 4
+    SHOCK: 5
+  countdown_thresholds:
+    approaching_hours: 24
+    imminent_hours: 1
+
+# Backtesting
+backtest:
+  enabled: false
+  start_date: "2020-01-01"
+  end_date: "2024-01-01"
+  
+  # Anti-leakage controls
+  walk_forward:
+    enabled: true
+    train_window_days: 365
+    test_window_days: 30
+    step_days: 7
+    
+  purged_cv:
+    enabled: true
+    embargo_days: 5
+    
+  friction_model:
+    spread_bps: 30
+    slippage_bps: 10
+    latency_seconds: 1
+
+# Performance Evaluation
+evaluation:
+  metrics:
+    - "accuracy"
+    - "precision"
+    - "recall"
+    - "f1"
+    - "balanced_accuracy"
+    - "brier_score"
+    - "log_loss"
+    - "calibration_error"
+    - "roc_auc"
+    
+  by_regime: true
+  by_horizon: true
+  by_confidence_bucket: true
+  
+  confidence_buckets:
+    - [0, 55]
+    - [55, 65]
+    - [65, 75]
+    - [75, 85]
+    - [85, 100]
+
+# UI Settings
+ui:
+  theme: "dark"
+  font_family: "Segoe UI"
+  font_size: 10
+  
+  layout:
+    top_bar_height: 60
+    left_panel_width: 250
+    right_panel_width: 400
+    bottom_panel_height: 200
+    
+  chart:
+    default_timeframe: "15m"
+    timeframes: ["1m", "5m", "15m", "30m", "1h", "4h", "1d"]
+    indicators: ["EMA_20", "EMA_50", "RSI", "MACD", "ATR"]
+    show_zones: true
+    show_events: true
+    
+  update_rates:
+    price_display_ms: 100
+    chart_update_ms: 1000
+    agents_update_ms: 5000
+    decision_update_ms: 10000
+
+# Security
+security:
+  never_hardcode_api_keys: true
+  use_environment_variables: true
+  separate_dev_test_prod: true
+
+# Paper Trading / Simulation
+paper_mode:
+  enabled: true
+  initial_balance: 100000
+  position_size_pct: 2
+  risk_per_trade_pct: 1
+  max_positions: 3
